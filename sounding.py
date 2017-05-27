@@ -236,18 +236,18 @@ if __name__ == '__main__':
     # ) for fq in [880, 935, 990, 1045, 1100, 1155, 1210, 1265, 1320, 1375, 1430, 1485, 1540, 1595, 1650, 1705, 1760]]
 
     new_octave_owertones = [MultiWaveBasedSample(
-        frequency=fq/4,
+        frequency=fq / 4,
         framerate=44100,
         waves=[
             (1, 80, SineWaveShape, {'dist_base': 3}),
-            (3/2, 15, SineWaveShape, {'dist_base': 3}),
-            (4/2, 10, SineWaveShape, {'dist_base': 3}),
-            (5/2, 6, SineWaveShape, {'dist_base': 3}),
-            (6/2, 4, SineWaveShape, {'dist_base': 3}),
-            (7/2, 2, SineWaveShape, {'dist_base': 3}),
-            # (8/2, 1, SineWaveShape, {'dist_base': 3}),
-            # (9/2, 1, SineWaveShape, {'dist_base': 3}),
-            # (7, 1, SineWaveShape, {'dist_base': 3}),
+            (3 / 2, 15, SineWaveShape, {'dist_base': 3}),
+            (4 / 2, 10, SineWaveShape, {'dist_base': 3}),
+            (5 / 2, 6, SineWaveShape, {'dist_base': 3}),
+            (6 / 2, 4, SineWaveShape, {'dist_base': 3}),
+            (7 / 2, 2, SineWaveShape, {'dist_base': 3}),
+            (8 / 2, 1, SineWaveShape, {'dist_base': 3}),
+            (9 / 2, 1, SineWaveShape, {'dist_base': 3}),
+            (7, 1, SineWaveShape, {'dist_base': 3}),
         ],
         sample_amplitude=200,
         length=2,
@@ -264,12 +264,18 @@ if __name__ == '__main__':
     # player.append(new_octave_owertones[a]+ new_octave_owertones[d] + new_octave_owertones[f])
 
     # new = distorted_sample + simple_sample
+    # t = SineWaveShape(
+    #     frequency=13,
+    #     amplitude=20,
+    #     framerate=44100
+    # )
 
-    # pyplot.plot(range(2000), [mrr3_sample[i] for i in range(2000)], label='merged')
+    # pyplot.plot(range(50_000), list(islice(t, 50_000)))
     # pyplot.plot(range(500), [sin_pure2[i] for i in range(500)], label='dist')
     # pyplot.plot(range(500), [sin_sum[i] for i in range(500)], label='dist')
     # pyplot.plot(range(500), [new[i] for i in range(500)], label='new')
     # pyplot.plot(range(500), [mrr_sample[i] for i in range(500)], label='MRR')
+    # pyplot.axes([-50, 44100, 50, 50])
     # pyplot.legend(loc='best')
     # pyplot.show()
 
