@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<!-- saved from url=(0043)https://zach.se/generate-audio-with-python/ -->
+<html lang="en-us"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        
+        
+        <title>Generate Audio with Python - Zach Denton</title>
+        
+        <meta name="author" content="Zach Denton">
+        <meta name="description" content="An introduction to audio synthesis in Python using itertools.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="./Generate Audio with Python - Zach Denton_files/main.css">
+        
+    <style type="text/css">/*.lleo_errorSelection *::-moz-selection,
+.lleo_errorSelection *::selection,
+.lleo_errorSelection *::-webkit-selection {
+    background-color: red !important;
+    color: #fff !important;;
+}*/
+
+#lleo_dialog,
+#lleo_dialog * {
+    color: #000 !important;
+    font: normal 13px Arial, Helvetica !important;
+    line-height: 15px !important;
+    margin: 0 !important;
+	padding: 0 !important;
+	background: none !important;
+	border: none 0 !important;
+	position: static !important;
+	vertical-align: baseline !important;
+	overflow: visible !important;
+	width: auto !important;
+	height: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+	float: none !important;
+	visibility: visible !important;
+	text-align: left !important;
+    text-transform: none !important;
+	border-collapse: separate !important;
+	border-spacing: 2px !important;
+    box-sizing: content-box !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
+    letter-spacing: normal !important;
+    -webkit-filter: none !important;
+    -moz-filter: none !important;
+    filter: none !important;
+}
+#lleo_dialog *:before,
+#lleo_dialog *:after {
+    content: '';
+}
+
+#lleo_dialog iframe {
+	height: 0 !important;
+	width: 0 !important;
+}
+
+#lleo_dialog {
+    position: absolute !important;
+    background: #fff !important;
+    border: solid 1px #ccc !important;
+    padding: 7px 0 0 !important;
+    left: -999px;
+    top: -999px;
+    width: 440px !important;
+    overflow: hidden;
+    display: block !important;
+    z-index: 999999999 !important;
+    box-shadow: 8px 16px 30px rgba(0, 0, 0, 0.16) !important;
+    border-radius: 3px !important;
+    opacity: 0 !important;
+    -webkit-transform: translateY(15px);
+    -moz-transform: translateY(15px);
+    -ms-transform: translateY(15px);
+    -o-transform: translateY(15px);
+    transform: translateY(15px);
+}
+#lleo_dialog.lleo_show_small {
+    width: 150px !important;
+}
+#lleo_dialog.lleo_show {
+    opacity: 1 !important;
+    -webkit-transform: translateY(0);
+    -moz-transform: translateY(0);
+    -ms-transform: translateY(0);
+    -o-transform: translateY(0);
+    transform: translateY(0);
+    -webkit-transition: -webkit-transform 0.3s, opacity 0.3s !important;
+    -moz-transition: -moz-transform 0.3s, opacity 0.3s !important;
+    -ms-transition: -ms-transform 0.3s, opacity 0.3s !important;
+    -o-transition: -o-transform 0.3s, opacity 0.3s !important;
+    transition: transform 0.3s, opacity 0.3s !important;
+}
+#lleo_dialog.lleo_collapse {
+    opacity: 0 !important;
+    -webkit-transform: scale(0.25, 0.1) translate(-550px, 100px);
+    -moz-transform: scale(0.25, 0.1) translate(-550px, 100px);
+    -ms-transform: scale(0.25, 0.1) translate(-550px, 100px);
+    -o-transform: scale(0.25, 0.1) translate(-550px, 100px);
+    transform: scale(0.25, 0.1) translate(-550px, 100px);
+    -webkit-transition: -webkit-transform 0.4s, opacity 0.4s !important;
+    -moz-transition: -moz-transform 0.4s, opacity 0.4s !important;
+    -ms-transition: -ms-transform 0.4s, opacity 0.4s !important;
+    -o-transition: -o-transform 0.4s, opacity 0.4s !important;
+    transition: transform 0.4s, opacity 0.4s !important;
+}
+#lleo_dialog input::-webkit-input-placeholder {
+    color: #aaa !important;
+}
+#lleo_dialog .lleo_has_pic #lleo_word {
+	margin-right: 80px !important;
+}
+#lleo_dialog #lleo_translationsContainer1 {
+	position: relative !important;
+}
+#lleo_dialog #lleo_translationsContainer2 {
+	padding: 7px 0 0 !important;
+	vertical-align: middle !important;
+}
+#lleo_dialog #lleo_word {
+    color: #000 !important;
+    margin: 0 5px 2px 0 !important;
+    /*float: left !important;*/
+}
+#lleo_dialog .lleo_has_sound #lleo_word {
+    margin-left: 30px !important;
+}
+#lleo_dialog #lleo_text {
+    font-weight: bold !important;
+    color: #d56e00 !important;
+    text-decoration: none !important;
+    cursor: default !important;
+}
+/*
+#lleo_dialog #lleo_text.lleo_known {
+    cursor: pointer !important;
+    text-decoration: underline !important;
+}
+*/
+/*#lleo_dialog #lleo_closeBtn {
+    position: absolute !important;
+    right: 6px !important;
+    top: 5px !important;
+    line-height: 1px !important;
+    text-decoration: none !important;
+    font-weight: bold !important;
+    font-size: 0 !important;
+    color: #aaa !important;
+    display: block !important;
+	z-index: 9999999999 !important;
+	width: 7px !important;
+	height: 7px !important;
+	padding: 0 !important;
+	margin: 0 !important;
+}*/
+
+#lleo_dialog #lleo_optionsBtn {
+    position: absolute !important; 
+    right: 3px !important;
+    top: 5px !important;
+    line-height: 1px !important;
+    text-decoration: none !important;
+    font-weight: bold !important;
+    font-size: 13px !important;
+    color: #aaa !important;
+    padding: 2px !important;
+	display: none;
+}
+    #lleo_dialog.lleo_optionsShown #lleo_optionsBtn {
+        display: block !important;
+    }
+    #lleo_dialog #lleo_optionsBtn img {
+        width: 12px !important;
+        height: 12px !important;
+    }
+#lleo_dialog #lleo_sound {
+    float: left !important;
+    width: 16px !important;
+    height: 16px !important;
+    margin-left: 9px !important;
+    margin-right: 3px !important;
+    background: 0 0 no-repeat !important;
+    cursor: pointer !important;
+    display: none !important;
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAfNJREFUeNq0U01IVFEU/u57Oo5WhBRIBBptykWLYBa2soWiEKQQEbrSFsGbVRQKQc2iFqGitXqvjQxCoCJCqyI0aBUtZILaJNUuYWYWo8HovJ/707nP94bnz0rxwvfOuefd8517fi5TSuE4i50YwZ3l37ZhNlpgzFkaaM/G9sHF1YskNrT+7l4PjMOcb78t2JL71uxgB+2UlfxHTtq5N94fIOh/88kWgWfl73ZCSQkpeGg3H091JY6dI2S00qA/N3KO3dDUYhFgEmZGurG+w9FqApIHsVM7kaTF9Nhn0r8Q7hPWQgIRuNaH3AMUA4W/Lkdh04cpFS43G0TgxQTvCdMETVAk3KynIHwXZU/ge8XDt7KH9bKLjU0P2zVO5LsEpSejVRJ9UR18EtfqKegovs9R3Q6w9c/H1o4Aa2Jwm1lIvn9RJ4w9RdRRzqcYrpwycCll4Cy1lnkS3Bc6vfBg28v8aRIfI78zhB/1GygROH3jLyyzMQ0zlUZuZBSlKkeLoegGtTjYLcJ8pF+NakHOFC2J6w+f25mxSfWrWFF/ShXVPTGvtN14NNkVnxlYWJkgZEL7/vwKr55lKSVnaGYWkuYgrgG172uUv47+U7fw0EHaJXmalUQy/HqO6lBzEsVjJC4Q8kd6TETQpjuaGOvjv8b/AgwA/ij1XMx58NIAAAAASUVORK5CYII=) !important;
+}
+#lleo_dialog .lleo_has_sound #lleo_sound {
+    display: block !important;
+}
+
+#lleo_dialog #lleo_soundWave {
+    border: solid 5px #4495CC !important;
+    border-radius: 5px !important;
+    position: absolute !important;
+    left: -5px !important;
+    top: -5px !important;
+    right: -5px !important;
+    bottom: -5px !important;
+    z-index: 0 !important;
+    opacity: 0.9 !important;
+    display: none !important;
+}
+    #lleo_dialog #lleo_soundWave.lleo_beforePlaying {
+        display: block !important;
+    }
+    #lleo_dialog #lleo_soundWave.lleo_playing {
+        opacity: 0 !important;
+        border-width: 20px !important;
+        border-radius: 30px !important;
+
+        -webkit-transform: scale(1.07,1.1) !important;
+        -moz-transform: scale(1.07,1.1) !important;
+        -ms-transform: scale(1.07,1.1) !important;
+        transform: scale(1.07,1.1) !important;
+
+        -webkit-transition: all 0.6s !important;
+        -moz-transition: all 0.6s !important;
+        -ms-transition: all 0.6s !important;
+        transition: all 0.6s !important;
+    }
+
+
+#lleo_dialog #lleo_picOuter {
+    position: absolute !important;
+    float: right !important;
+    top: 4px;
+    right: 5px;
+    z-index: 9 !important;
+    display: none !important;
+    width: 100px !important;
+}
+    #lleo_dialog.lleo_optionsShown #lleo_picOuter {
+        right: 25px;
+    }
+#lleo_dialog .lleo_has_pic #lleo_picOuter {
+    display: block !important;
+}
+    #lleo_dialog #lleo_picOuter:hover {
+        width: auto !important;
+        z-index: 11 !important;
+    }
+#lleo_dialog #lleo_pic,
+#lleo_dialog #lleo_picBig {
+    position: absolute !important;
+    top: 0 !important;
+    right: 0 !important;
+    border: solid 2px #fff !important;
+    -webkit-border-radius: 2px !important;
+    -moz-border-radius: 2px !important;
+	border-radius: 2px !important;
+    z-index: 1 !important;
+}
+#lleo_dialog #lleo_pic {
+	position: relative !important;
+    border: none !important;
+	width: 30px !important;
+}
+#lleo_dialog #lleo_picBig {
+    box-shadow: -1px 2px 4px rgba(0,0,0,0.3);
+    z-index: 2 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+    #lleo_dialog #lleo_picOuter:hover #lleo_picBig {
+        visibility: visible !important;
+        opacity: 1 !important;
+        -webkit-transition: opacity 0.3s !important;
+        -webkit-transition-delay: 0.3s !important;
+    }
+#lleo_dialog #lleo_transcription {
+    margin: 0 80px 4px 31px !important;
+    color: #aaaaaa !important;
+}
+#lleo_dialog .lleo_no_trans {
+    color: #aaa !important;
+}
+
+#lleo_dialog .ll-translation-counter {
+	float: right !important;
+    font-size: 11px !important;
+    color: #aaa !important;
+    padding: 2px 2px 1px 10px !important;
+}
+
+#lleo_dialog .ll-translation-text {
+	float: left !important;
+	/*width: 80% !important;*/
+}
+
+#lleo_dialog #lleo_trans a {
+    color: #3F669F !important;
+    text-decoration: none !important;
+    text-overflow: ellipsis !important;
+    padding: 1px 4px !important;
+    overflow: hidden !important;
+    float: left !important;
+    width: 320px !important;
+}
+
+#lleo_dialog .ll-translation-item {
+    color: #3F669F !important;
+    border: solid 1px #fff !important;
+    padding: 3px !important;
+    width: 100% !important;
+    float: left !important;
+	-moz-border-radius: 2px !important;
+	-webkit-border-radius: 2px !important;
+	border-radius: 2px !important;
+}
+
+#lleo_dialog .ll-translation-item:hover {
+	border: solid 1px #9FC2C9 !important;
+    background: #EDF4F6 !important;
+	cursor: pointer !important;
+}
+#lleo_dialog .ll-translation-item:hover .ll-translation-counter {
+	color: #83a0a6 !important;
+}
+
+#lleo_dialog .ll-translation-marker {
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAAWSURBVBhXY7RPm/+fAQkwIXNAbMICAJQ8AkvqWg/SAAAAAElFTkSuQmCC) !important;
+    display: inline-block !important;
+    width: 4px !important;
+    height: 4px !important;
+    margin: 7px 5px 2px 2px !important;
+    float: left !important;
+}
+
+#lleo_dialog #lleo_icons {
+    color: #aaa !important;
+    font-size: 11px !important;
+    background: #f8f8f8 !important;
+    padding: 10px 10px 10px 16px !important;
+}
+#lleo_icons a {
+    display: inline-block !important;
+    width: 16px !important;
+    height: 16px !important;
+    margin: 0 10px -4px 3px !important;
+    text-decoration: none !important;
+    opacity: 0.5 !important;
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHIAAAAQCAYAAADK4SssAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAADopJREFUeNqsWQt0lNWd/33fzGQemUcmzwkhSkhYSSgpJJGVWHlEVEwLq0AFhC520xN0cfcUkHZ7QNetwfac6mp3oR5Ss8c9XaPVhoJCtGwSkYQglQBBNg/IgxBIQl7zyCSZ97f/e7+ZyeShpu7eM/fc797vu9/j/u7v93+MUqlUwuv1IlQ6Ojqk7u5utLaWo/nanfB45tbnsSI6GgsXLhQwpcx/9rCE/0PpOLSL39Pnh9TY2Y1NJXW4NeTFz59agp9uXASfYwR/Xv9dxJ6pxwJBhCIQoKtFuIUAXPRksyTx+U2rVy0TtdrywNhYeviFJAlSsJ1oJNY2ZdfVLeKdiGIb96Kqw45LvU40Dbj42F2mKNyXasCjGTGI0aqmvr6wdseL075fEORl6h+yYWzcDaNeh8Q4E7z0kVPLx//5Il0uTLqHQqGA3z/92qioKHg8Hn5/SZqYogwdOBwO6d19+9DQ0ADdqrmTJhesLML6nQ38uLj4jHSkuJi/a+Q1vd8QxORg6/dBUtDblLzbhBuuOIhJcfhl5QCeyB9DusWA3MO/hf2+e6FwjtFHKGj15Y8M0Cd0KQTpbr8kCBrNsaTn9iXoH3jga5/739nZC7Mj+n7aHBVNwwSUEhuy4rCR6m8vD9ID5MVyeAI4cPo2suI0KMpJgEoU+A5QiCKmg0jT6H49/cP4Tt4i/FXaHLS0d6O57RZ0WvXXvltaWhpOnz7NCbZ371588MEHHLQ9e/bwev78eTzzzDPo7+8PzxFDIO4rKOAgomHihq+9ckxgdd26dWHQSkuBvJ2lmLqTv2kJbQAGot/nw9U7xDa9CQHakY5xFd45f4OdhWZhFtz534GP9k9A9PPWIxGgAu2AgHwP79hYYseRI8q+f/832Kqr4O7t5bt6pioFAmIkiJXXrbCYtbg85MF1q5vv+IFxH6KUApSizLDsJB09F2i3yozoc3pn/CaBVKPr9gC+X3g/3ih5GruL1mPPjx7DwLCdA/x1xWKx4K677kJ6ejpWr14dHt+xYwdSUlKQl5cHvV4/aQ7/GMZEDiDVI9IF4asecqQ4FwzvnaWl/x84hhnJwFAKSiTFaCDS7ifhhEjMu9pJS0dg0SH8Bh28BKqCXSuRxAp+ApMAFBX8Hj6PR3G+uhrDFRXoeekltG3ZjOsbN6L7wH4M/O53GKEX97pc8NGGCckSW9ibdg9anBJqu0ZgpFvNM0ahf8yH75GU7siOx3aqIjHQS8+N0SiRGa/BhR4nLHpVhBSKfEN03erHny+3IinehBf+cQuqzzby8+1dfURuKSy5X1UMBkP4eM6cOfxdmdQuWrSIj7nd7mlAKquqqqTyVXtnvfCFhUkoRi4xswG7V7RIM9lMVvJJHoryM7Gr4hxcLisfO7m3EIcrm1HZ3DmNkYIo79RHFsfjbHMvlGozLTKBKSpJPhUQ3WRvmlpwO1mE1WCGygMk2pxIcHjhlfzBzSDbQ2Jb2C56Bwfhra2F40wtFxHRaMK899+nU/LzGGAvnR+ARSUTNDVaBTVRMI6AO3VjhMCRkGPRUQusutuABbFqDsaJ63akmtQEZhSf5xx1wWTU4eBPfoDBYQeSE818fOV9i/HZpVYcPPQeLPHmWQGZmJgYPmasZGXt2rUcTFaiyVeJBJszMgxi7uxZxFjJrn/tzBnef5MA6iwp4uCFyrjVhieXp6H5wIYw61ip2FUIjcYc7oeO227a2DKjeG0GFib74LPZoVf58NTKuSSiAkr/9CaeeMSFFQeWYsOPv4XCvVl44GdLsbVoMU5mmcLsCrUBWnneRlYa81qHJzHy983UJzBvOTy8ppvV/Nz+2j581GwjGZav27AwBp/dHsUgXcuY1TLgxns0N/y9LjdMhmisJuD+dkMB1j24jJ7jx5vvnsLT+98gJ8cHg147q/XNysoCcziHhoY4C1NTU7F582Y0NjZikDZmXFzcdGkt6f8IxReO/KWKKDAsS4P29EDZOVhJsqqDgC6NMeOSzQrzc+Uhr5SDvPHwOd4/vHF5WFYL0mL48fee/wBHP2lGkl6Dcy+vwVu70nHhYB7WLJmDX/ypFDsbf42erBTZmwPRkfTVRTJXnx2Ln27PnQCSFpm1UhA8KeDnAPI2OM6cCCnoxLzfYkP3qA/dTh/ujPuxxKJF7e0x1BIbB91+LErUYoDA23rsBk5ccyCRGHu224meMT+fGyrxsUb09VtBHiyy1/4DOm7ewcjoOF58vRz6aDUSyGP1zeCxzlSYnLa3t8NqtUKtVnM2LliwALWkLIyJbA00Gs1kaaVJQjD8mOa87H7uMT722LrdMzyOFq9BRrKPQMspeZsDU09AHn1ug7yLXzmKtANlKNtWyEF+tvwcHny1kh8XZBbBQvawzya7+MMuLX7063r85vhlFORasH/7CtouEk5f/xzPf/IykJFI8ubjVl3wqYJSSrbTEwi/ul+SJTUEaESowVuOHXUiGXnJ6oVRLTP50XkGREcp8M41GzpcPjycZICOJPdfzvXhf0a8+GGWnhwfAUdJVtvo/IhnAphAQOJ2Uh2lQrROgzlJsQRmHwFsQrRWQ8wOzJoljG03b97kjMzIyMDWrVu5XaypqcGWLVsQGxsLo9E43dmZzY1n64Ey4Ha9XcP7DFAG4qGT5/BqzSUcenI5Dm3L5+dqyA4yUPPpelZiFR7oozSov+7Cq+XXcKN/lBZbgfmxKchIzyEL74JIjqboVxIkBCAtnAAVj4Ek0SMvZnCxQrLqj6wRUhsJJK097rj8vK4hG+ghKX2fgGL9VanRXEb/i5jH+o/ON5LDI6G8Ve6LX2LuEgg8jVqFnjvD8Hh9s7KLkxzA5GR88cUXOH78OO8zz5W998mTJ9HZ2Ul+g8jlNfK+XwlkKPzIzc2d4U0aJtlVJqche8ecmRCgBZnJxNInZfDoJTItMSSxlSh6uxL1nRNOj9c2iLlaN9bnxeMHaxfC5qAQgZ6aGpeMs1tK8XD8CkhjTlpYGiSAA4LMQ84yr2qatPpD8uqPlFm55dIaBHLzPSZIPgksuls334CaW04MkcyKBOg6Au6znjH0EBtTSMbvn6NDzQ0HOUh+PofNjSzs3g7nOCwJsrnout0fTkR8qY2aAWSz2Qyn0ymHg8HS3NzMEwHDw8Nhh2fGhMBfUljcyexjcQSQjH0hqXz7Inmml3oJOBsHtDAzDYe3FfDz5ec6Z/RaS/YU4KHcxYgzi/DZmzA8dAZdl3uQnLEJ8YYEnNj0Ov7mvT34uLcaUhTJip88WWJWIKAIpyZC3ioHjR1JEZmdCImNZGTx4jiUXbWjMM0IA8lqxXUHD+hXpuoRr1Xil239fLGfINBEan9P7BQ4FQU+V3aOJc4+pVKBzu4+PLWpgI9/WPM5OTi6aVmYyDJ1XKvVchvIWNfa2gqbzYaYmBhcvHiRn3e5XOHMzyQb+U2A3PfudU7I3btXhMeYPczJSkOaRYNtOZnYW7A0bP8YsCWVsrQeICbOFEduLfg2nIONuHz8aZhxBUrVGJRuEZ3XDiHlwT/CGJuOfy3Yi7r/uIIRkmGFjxYnwLIItKi+CSC5LQy24TWakqbjqa/gcS45M0uTNBwoJpvH2x3cS348w8gX+Xib3P/+PTFw+wI41j7C+0voO9lcbt/tTjz+yHIUrs6Fj+59b/YCUpRR2Kk6yeFhVU92U6OO4naUybXb4+XjLHUXWZhkqlQqDhh7z7a2Np4AuHr1aohE4ViTpVfZpvxGQL5UeYfHkCxLFxlDMi/1Ur0cLx44Ws9ldlvOBLAhtvZ+SWbHHRhFa/VOpBvPw2RmwTUF/14JmsEm9NfthmH9CdwTfzcs0YkYcXXCz9ItBKKKHB+fT86weP3+PkLMEo4jg6yMBDEEZIgJbOdXbUjD65eHUHumD0PjPs7wJqsb/1TXh3aKU1MMKiwjb/bDNjtsJKkatYC3Hkrhc/kmXrscP3tmEy43dWJJlhyCMafnk3cO4sKVNlTXX+FMHbQ64HJ7OaCW+Bjk52by8cgyb948XkdGRnifAUjrzG0jT3oEgWN2NDIXq4w0ebMpDMTcXBZLFn9lnpUlAcoigC3Kz+GMZACHEgSRcaTH3g+97xY0qhiMkI0SfGQH6T112lj4XbcheEcxLkbD5RylhVaRrEaRnfSSp+oPhxIdbvezGqWyjEAyRUrWVCBd4+PSRbf79KaQTSL79/cUxtxf0SknSlmsfMUatmHLLDouq0eJrfPj1PjNymSYVBPuhdmkD4cgpz+7ircqqqEimd3+2Cqs/OtvIS87I3zt6JiLJxkYCMyeNkaYGZ5YINtYVVUVls6ysjJuGxn7WDl16hQHmkkua0MAh4H8lb0G+0wFM4PX0BBeBQZiza+2TEqaJ0eAGQpBJuUOYyZinpzkGHJyrNOeoY2ZB3XCGowOV0Cp0/HQQylEwT+ugHrOOrKLenz4+cfosfdCMJDdYZkZryh7qpKcXdnZ1VXBcg4/TkwUF2k0+00KxaNmhSJPIQiT/rLoaGv7/BeDgw+9HDGWpFOh5ckM/KFjBD+pv4MeZ5C19BOVMmiPLzDhlRXJaOwdxVxj9IR/8FE9zl9q5Uy7eq0LNvsoHz97oYXCEDOSE8xIosrklaX6HCNj6O4d4uHJ1MKcmhdeeAF2u5336+rqOOgh23jixAlcuXJlGiOFqX9jsfLpp59Kxz58jXutISCZB7Vq6WZsvdc0499Y1iDTmPe6sYAko09+cC8Ftb29cuBcUrQcyVoz8l+ZsJNmmhP+G2t0SLI1vg6l/QuI3jEEVBqoLQ9DsbgILT19+O4bu3BLHKDFoLCA7SOJZEZSQTpY86X+/TK9XvmEyfR30aK4MUWjyffpdM4NjY2RyaZpXgizsSPeAKxuOZwxq0Wyj360DpFtpsvvm6sPyypbwzXbn5eYTWS206jXUhCv4gLA7sOk1OX2kE1kGaEAv4Y5RVq6RqtR8+OP3vrnaX9jRXq1kvT1/0/8rwADAJ+LRelLmVNwAAAAAElFTkSuQmCC) !important;
+}
+#lleo_icons a:hover {
+    opacity: 1 !important;
+}
+#lleo_icons a.lleo_google     {background-position:-34px 0 !important;}
+#lleo_icons a.lleo_multitran  {background-position:-64px 0 !important;}
+#lleo_icons a.lleo_lingvo     {background-position:-51px 0 !important; width: 12px !important;}
+#lleo_icons a.lleo_dict       {background-position:-17px 0 !important;}
+#lleo_icons a.lleo_linguee    {background-position:-81px 0 !important;}
+#lleo_icons a.lleo_michaelis  {background-position:-98px 0 !important;}
+
+#lleo_dialog #lleo_contextContainer {
+    margin: 0 !important;
+    padding: 3px 15px 8px 10px !important;
+    background: #eee !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#eee)) !important;
+    background: -moz-linear-gradient(-90deg, #fff, #eee) !important;
+    border-bottom: solid 1px #ddd !important;
+    border-top-left-radius: 3px !important;
+    border-top-right-radius: 3px !important;
+    display: none !important;
+    overflow: hidden !important;
+}
+#lleo_dialog .lleo_has_context #lleo_contextContainer {
+    display: block !important;
+}
+#lleo_dialog #lleo_context {
+    color: #444 !important;
+    text-shadow: 1px 1px 0 #f4f4f4 !important;
+    line-height: 12px !important;
+    font-size: 11px !important;
+    margin-left: 2px !important;
+}
+#lleo_dialog #lleo_context b {
+    line-height: 12px !important;
+    color: #000 !important;
+    font-weight: bold !important;
+    font-size: 11px !important;
+}
+/*#lleo_dialog #lleo_gBrand {
+    color: #aaa !important;
+    font-size: 10px !important;
+    *//*padding-right: 52px !important;*//*
+    padding-bottom: 14px !important;
+    margin: -3px 4px 0 4px !important;
+    background: left bottom url(data:image/png;base64,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) no-repeat !important;
+    display: inline-block !important;
+    float: right !important;
+}
+#lleo_dialog #lleo_gBrand.hidden {
+    display: none !important;
+}*/
+#lleo_dialog #lleo_translateContextLink {
+    color: #444 !important;
+    text-shadow: 1px 1px 0 #f4f4f4 !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#f4f4f4), to(#ddd)) !important;
+    background: -moz-linear-gradient(-90deg, #f4f4f4, #ddd) !important;
+    border: solid 1px !important;
+    box-shadow: 1px 1px 0 #f6f6f6 !important;
+    border-color: #999 #aaa #aaa #999 !important;
+    -moz-border-radius: 2px !important;
+	-webkit-border-radius: 2px !important;
+	border-radius: 2px !important;
+    padding: 0 3px !important;
+    font-size: 11px !important;
+    text-decoration: none !important;
+    margin: 1px 5px 0 !important;
+    display: inline-block !important;
+    white-space: nowrap !important;
+}
+#lleo_dialog #lleo_translateContextLink:hover {
+    background: #f8f8f8 !important;
+}
+#lleo_dialog #lleo_translateContextLink.hidden {
+    visibility: hidden !important;
+}
+
+#lleo_dialog #lleo_setTransForm {
+    display: block !important;
+    margin-top: 3px !important;
+    padding-top: 5px !important;
+    /* Set position and background because the form might be overlapped by an image when no translations */
+    position: relative !important;
+    background: #fff !important;
+    z-index: 10 !important;
+    padding-bottom: 10px !important;
+    padding-left: 16px !important;
+}
+#lleo_dialog .lleo-custom-translation {
+    padding: 4px 5px !important;
+    border: solid 1px #ddd !important;
+	border-radius: 2px !important;
+    width: 90% !important;
+    min-width: 270px !important;
+    background: -webkit-gradient(linear, 0 0, 0 20, from(#f1f1f1), to(#fff)) !important;
+    background: -moz-linear-gradient(-90deg, #f1f1f1, #fff) !important;
+	font: normal 13px Arial, Helvetica !important;
+	line-height: 15px !important;
+}
+#lleo_dialog .lleo-custom-translation:hover {
+    border: solid 1px #aaa !important;
+}
+#lleo_dialog .lleo-custom-translation:focus {
+    background: #FFFEC9 !important;
+}
+
+#lleo_dialog *.hidden {
+    display: none !important;
+}
+
+#lleo_dialog .infinitive{
+    color: #D56E00 !important;
+    text-decoration: none;
+    border-bottom: 1px dotted #D56E00 !important;
+}
+#lleo_dialog .infinitive:hover{
+    border: none !important;
+}
+
+#lleo_dialog .lleo_separator {
+    height: 1px !important;
+    background: #eee;
+    margin-top: 10px !important;
+    background: -webkit-linear-gradient(left, rgba(255,255,255,1) 0%,#eee 8%,rgba(255,255,255,1) 80%) !important;
+    background: -moz-linear-gradient(left, rgba(255,255,255,1) 0%, #eee 8%, rgba(255,255,255,1) 80%) !important;
+    background: -ms-linear-gradient(left, rgba(255,255,255,1) 0%,#eee 8%,rgba(255,255,255,1) 80%) !important;
+    background: linear-gradient(to right, rgba(255,255,255,1) 0%,#eee 8%,rgba(255,255,255,1) 80%) !important;
+}
+#lleo_dialog #lleo_trans {
+    /*border-top: 1px solid #eeeeee !important;*/
+    padding: 5px 30px 0 14px !important;
+    zoom: 1;
+}
+
+#lleo_dialog .lleo_clearfix {
+	display: block !important;
+	clear: both !important;
+	visibility: hidden !important;
+	height: 0 !important;
+	font-size: 0 !important;
+}
+
+
+#lleo_dialog #lleo_picOuter table {
+    width: 44px !important;
+    position: absolute !important;
+    right: 0 !important;
+    top: 0 !important;
+    vertical-align: middle !important;
+}
+
+#lleo_dialog #lleo_picOuter td {
+    width: 38px !important;
+    height: 38px !important;
+    /*border: 1px solid #eeeeee !important;*/
+    vertical-align: middle !important;
+    text-align: center !important;
+}
+
+#lleo_dialog #lleo_picOuter td div {
+	height: 38px !important;
+	overflow: hidden !important;
+}
+
+#lleo_dialog .lleo_empty {
+    margin: 0 5px 7px !important;
+}
+
+#lleo_youtubeExportBtn {
+    margin-left: 10px;
+    height: 24px;
+}
+    #lleo_youtubeExportBtn i {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        background: 0 0 url(https://d144fqpiyasmrr.cloudfront.net/plugins/all/images/i16.png) !important;
+    }
+    #lleo_youtubeExportBtn .yt-uix-button-content {
+        font-size: 12px;
+        line-height: 2px;
+    }
+
+
+/*** Parsed Lyrics Content *****************************/
+
+.lleo_lyrics tran {
+    background: transparent !important;
+    border-radius: 2px !important;
+    text-shadow: none !important;
+    cursor: pointer !important;
+}
+    .lleo_lyrics tran:hover {
+        color: #fff !important;
+        background: #C77213 !important;
+        -webkit-transition: all 0.1s !important;
+        -moz-transition: all 0.1s !important;
+        -ms-transition: all 0.1s !important;
+        -o-transition: all 0.1s !important;
+        transition: all 0.1s !important;
+    }
+
+.lleo_songName {
+    border: solid 1px #ffd47c;
+    background: #fff1c2;
+    border-radius: 2px;
+}
+
+.lleo_hidden_iframe {
+    visibility: hidden;
+}</style></head>
+    
+    <body>
+    
+        <div id="banner"><canvas style="width: 1903px; height: 350px;" width="1903" height="350"></canvas></div>
+        <header id="header">
+            <h1><a href="https://zach.se/">Zach Denton</a></h1>
+            <nav>
+            <ul>
+                <li><a href="https://zach.se/about/">About</a></li>
+                <li><a href="https://zach.se/archives/">Blog</a></li>
+                <li><a href="https://zach.se/project-euler-solutions/">Euler</a></li>
+                <li><a href="https://github.com/zacharydenton">GitHub</a></li>
+                <li><a href="https://zach.se/resume.pdf">Resume</a></li>
+            </ul>
+            </nav>
+        </header>
+        <article>
+  <h2 class="title"><a href="https://zach.se/generate-audio-with-python/">Generate Audio with Python</a></h2>
+
+  <h2 id="introduction">Introduction</h2>
+<p>I’ve been intrigued by the concept of using computers to generate audio for a long time. It turns out that you can generate audio with nothing but the standard library of Python.</p>
+<p>The approach I used relies heavily on the <code>itertools</code> module. Essentially, I use <code>itertools</code> to create infinite generators and then take some data from these generators to produce the audio. The resultant sequence of floats in the range [-1.0, 1.0] is converted to 16 bit PCM audio (i.e., a sequence of signed 16 bit integers in the range [-32767, 32767]) and then written to a .wav file using the <code>wave</code> module. <!--more--></p>
+<p>If you’re not familiar with iterators and the <code>itertools</code> module, this post may be somewhat hard to follow. <code>itertools</code> really opens up some interesting possibilities in Python, making it more like Lisp or Haskell. In truth, if you’re relying on <code>itertools</code> as much as I am in this post, you might as well just use Lisp or Haskell and receive a nice performance boost. The reason I didn’t is quite simply because I wanted to generate some audio in Python.</p>
+<p>To follow the code examples below, you probably need to perform the following imports:</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> sys
+<span class="im">import</span> wave
+<span class="im">import</span> math
+<span class="im">import</span> struct
+<span class="im">import</span> random
+<span class="im">import</span> argparse
+<span class="im">from</span> itertools <span class="im">import</span> <span class="op">*</span></code></pre></div>
+<h2 id="generating-waves">Generating Waves</h2>
+<p>You may remember from your physics class that sound consists of waves. Many instruments produce tones that are basically a combination of pure sine waves. Thus, we need a way to produce sine waves if we want to generate audio. My first approach was something like this:</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> sine_wave(frequency<span class="op">=</span><span class="fl">440.0</span>, framerate<span class="op">=</span><span class="dv">44100</span>, amplitude<span class="op">=</span><span class="fl">0.5</span>):
+    <span class="cf">if</span> amplitude <span class="op">&gt;</span> <span class="fl">1.0</span>: amplitude <span class="op">=</span> <span class="fl">1.0</span>
+    <span class="cf">if</span> amplitude <span class="op">&lt;</span> <span class="fl">0.0</span>: amplitude <span class="op">=</span> <span class="fl">0.0</span>
+    <span class="cf">return</span> (<span class="bu">float</span>(amplitude) <span class="op">*</span> math.sin(<span class="fl">2.0</span><span class="op">*</span>math.pi<span class="op">*</span><span class="bu">float</span>(frequency)<span class="op">*</span>(<span class="bu">float</span>(i)<span class="op">/</span><span class="bu">float</span>(framerate))) <span class="cf">for</span> i <span class="op">in</span> count(<span class="dv">0</span>))</code></pre></div>
+<p>This computes a sine wave of infinite length at the specified frequency, and returns an infinite generator which samples the wave 44,100 times per second.</p>
+<p>The problem with this approach is that it is inefficient. Sine waves are periodic functions, meaning that they repeat themselves after a certain period. This means that we can pre-calculate the function for one period, and then return an iterator which simply cycles these pre-computed values indefinitely:</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> sine_wave(frequency<span class="op">=</span><span class="fl">440.0</span>, framerate<span class="op">=</span><span class="dv">44100</span>, amplitude<span class="op">=</span><span class="fl">0.5</span>):
+    period <span class="op">=</span> <span class="bu">int</span>(framerate <span class="op">/</span> frequency)
+    <span class="cf">if</span> amplitude <span class="op">&gt;</span> <span class="fl">1.0</span>: amplitude <span class="op">=</span> <span class="fl">1.0</span>
+    <span class="cf">if</span> amplitude <span class="op">&lt;</span> <span class="fl">0.0</span>: amplitude <span class="op">=</span> <span class="fl">0.0</span>
+    lookup_table <span class="op">=</span> [<span class="bu">float</span>(amplitude) <span class="op">*</span> math.sin(<span class="fl">2.0</span><span class="op">*</span>math.pi<span class="op">*</span><span class="bu">float</span>(frequency)<span class="op">*</span>(<span class="bu">float</span>(i<span class="op">%</span>period)<span class="op">/</span><span class="bu">float</span>(framerate))) <span class="cf">for</span> i <span class="op">in</span> <span class="bu">xrange</span>(period)]
+    <span class="cf">return</span> (lookup_table[i<span class="op">%</span>period] <span class="cf">for</span> i <span class="op">in</span> count(<span class="dv">0</span>))</code></pre></div>
+<p>This resulted in a substantial performance improvement on my machine, but this is Python after all so a discussion of performance is perhaps a moot point.</p>
+<h2 id="generating-noise">Generating Noise</h2>
+<p>Sometimes you want to generate noise. The simplest kind of noise is called white noise, which is completely random audio data.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> white_noise(amplitude<span class="op">=</span><span class="fl">0.5</span>):
+    <span class="cf">return</span> (<span class="bu">float</span>(amplitude) <span class="op">*</span> random.uniform(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="cf">for</span> _ <span class="op">in</span> count(<span class="dv">0</span>))</code></pre></div>
+<p>The main downside to this approach is that random values need to be calculated 44,100 times per second. Using the <code>itertools</code> module, we can pre-calculate one second of white noise, and then just cycle that data:</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">noise <span class="op">=</span> cycle(islice(white_noise(), <span class="dv">44100</span>))</code></pre></div>
+<h2 id="combining-functions">Combining Functions</h2>
+<p>As I mentioned earlier, complex sounds can be modeled as combinations of pure sine waves. If you’re generating a stereo audio file, you can have different audio functions in each channel. The way I chose to represent this concept is as follows:</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">c1 <span class="op">=</span> (f1, ..., fn)
+c2 <span class="op">=</span> (f1, ..., fn)
+channels <span class="op">=</span> (c1, c2)</code></pre></div>
+<p><code>c1</code> is the left channel, <code>c2</code> is the right channel. Each channel is an iterable containing the functions that comprise that channel. All channels are then combined into a single iterable, <code>channels</code>.</p>
+<p>If you play the same sound through both channels of a stereo audio file, the sound will seem to come from the center of the soundstage.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">channels <span class="op">=</span> ((sine_wave(<span class="fl">440.0</span>),),
+            (sine_wave(<span class="fl">440.0</span>),))</code></pre></div>
+<p>You can also control the location of the sound by altering the amplitude of the waves. This example will make a 440.0 Hz sine wave which is slightly left of center:</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">channels <span class="op">=</span> ((sine_wave(<span class="fl">440.0</span>, amplitude<span class="op">=</span><span class="fl">0.5</span>),),
+            (sine_wave(<span class="fl">440.0</span>, amplitude<span class="op">=</span><span class="fl">0.2</span>),))</code></pre></div>
+<p>Additionally, you can have more than one function playing at the same time. Here’s an example of a 200.0 Hz tone in the left channel, a 205.0 tone in the right channel, and some white noise in the background:</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">channels <span class="op">=</span> ((sine_wave(<span class="fl">200.0</span>, amplitude<span class="op">=</span><span class="fl">0.1</span>), white_noise(amplitude<span class="op">=</span><span class="fl">0.001</span>)),
+            (sine_wave(<span class="fl">205.0</span>, amplitude<span class="op">=</span><span class="fl">0.1</span>), white_noise(amplitude<span class="op">=</span><span class="fl">0.001</span>)))</code></pre></div>
+<p>That’s a <a href="http://en.wikipedia.org/wiki/Binaural_beats">binaural beat</a>.</p>
+<h2 id="computing-samples">Computing Samples</h2>
+<p>Recall from your physics class that waves combine with each other to produce new waves. We can compute this new wave by simply adding the waves together.</p>
+<p>Now that we have defined the audio channels, we need to compute the sum of the functions in the channel at each sample in the file. Since our waves are represented as generators, we want to create a new generator which calculates the sum of each sample in the input generators. Essentially we want a function that accepts audio channels in the format described above and returns a generator which yields tuples where element 0 is the sum of the functions in the left channel at that point, and element 1 is the sum of the functions in the right channel at that point.</p>
+<p>This calls for use of the <code>imap</code> and <code>izip</code> functions.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> compute_samples(channels, nsamples<span class="op">=</span><span class="va">None</span>):
+    <span class="cf">return</span> islice(izip(<span class="op">*</span>(imap(<span class="bu">sum</span>, izip(<span class="op">*</span>channel)) <span class="cf">for</span> channel <span class="op">in</span> channels)), nsamples)</code></pre></div>
+<p>Note that if <code>nsamples</code> is specified, we return a sequence of finite length (using the <code>islice</code> function). Otherwise, we return a sequence of infinite length. Since we are using iterators, sequences of infinite length can be represented more or less elegantly and efficiently.</p>
+<h2 id="writing-a-wavefile">Writing a Wavefile</h2>
+<p>The next step is to use the <code>wave</code> module to create a <code>.wav</code> file. The first thing to do is to generate the wave header, which is some information at the beginning of the wavefile that describes the contents of the file. The information we need to generate this header is as follows:</p>
+<ul>
+<li><code>nchannels</code> - the number of channels contained in the file. For stereo, this is 2.</li>
+<li><code>sampwidth</code> - the size of each sample, in bytes. Recall that a byte is 8 bits, so for 16 bit audio this is 2.</li>
+<li><code>framerate</code> - the number of samples per second. I usually set this to 44100 (CD quality).</li>
+<li><code>nframes</code> - the total number of samples to write. This is equal to the framerate multiplied by the duration of the file in seconds.</li>
+</ul>
+<p>To open a wavefile for writing with the <code>wave</code> module, do this:</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">w <span class="op">=</span> wave.<span class="bu">open</span>(filename, <span class="st">'w'</span>)
+w.setparams((nchannels, sampwidth, framerate, nframes, <span class="st">'NONE'</span>, <span class="st">'not compressed'</span>))</code></pre></div>
+<p>The <code>'NONE'</code> and <code>'not compressed'</code> just indicate that we are creating an uncompressed wavefile (nothing else is supported by the <code>wave</code> module at the time of writing).</p>
+<p>Now the wavefile is ready for our audio data. 16 bit audio is encoded as a series of signed 16 bit integers. The first thing to do is to scale our sequence of floats in the range [-1.0, 1.0] to signed 16 bit integers (in the range [-32767, 32767]). For example:</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">max_amplitude <span class="op">=</span> <span class="fl">32767.0</span>
+samples <span class="op">=</span> (<span class="bu">int</span>(sample <span class="op">*</span> max_amplitude) <span class="cf">for</span> sample <span class="op">in</span> samples)</code></pre></div>
+<p>We’re writing a binary format, so we need the <code>struct</code> module to convert our audio data to the correct binary encoding. Specifically, we need the <code>struct.pack</code> function. The <code>struct.pack</code> function uses format strings to designate how to pack the data. A signed 16 bit integer is also known as a signed short, so we want to use the format string ‘h’ (the format string for a signed short). Thus, to pack the integer 1000 into a signed short:</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">struct.pack(<span class="st">'h'</span>, <span class="dv">1000</span>)</code></pre></div>
+<p>Now, we are going to be creating stereo audio files, so we need to consider how <code>.wav</code> files represent multiple channels. It turns out that <code>.wav</code> files look something like this:</p>
+<pre><code>L1R1L2R2L3R3L4R4</code></pre>
+<p>Where <code>L1</code> is the first sample in the left channel, <code>R1</code> is the first sample in the right channel, and so on. In other words, the channels are interleaved.</p>
+<p>Finally, we want to keep performance in mind. On one extreme, we write data to the file every time we compute a sample. This is memory-efficient, but incurs a severe performance penalty due to the overhead of writing to the file. On the other extreme, we pre-compute the entire file and write all of the samples at once. This does not incur the aforementioned performance penalty, but it has two major problems. First, it requires a huge amount of memory, since the entire <code>.wav</code> file will be loaded into memory. Second, it means you can’t stream the audio as it is generated, which means you can’t play the audio in realtime (by writing to <code>stdout</code> and piping to <code>aplay</code>, for example).</p>
+<p>Thus, we take the third approach: buffer chunks of the audio stream and write each chunk as it is computed. This offers the advantages of both techniques.</p>
+<p>So, putting all of this together, we end up with something like this:</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> grouper(n, iterable, fillvalue<span class="op">=</span><span class="va">None</span>):
+    <span class="co">"grouper(3, 'ABCDEFG', 'x') --&gt; ABC DEF Gxx"</span>
+    args <span class="op">=</span> [<span class="bu">iter</span>(iterable)] <span class="op">*</span> n
+    <span class="cf">return</span> izip_longest(fillvalue<span class="op">=</span>fillvalue, <span class="op">*</span>args)
+
+<span class="kw">def</span> write_wavefile(filename, samples, nframes<span class="op">=</span><span class="va">None</span>, nchannels<span class="op">=</span><span class="dv">2</span>, sampwidth<span class="op">=</span><span class="dv">2</span>, framerate<span class="op">=</span><span class="dv">44100</span>, bufsize<span class="op">=</span><span class="dv">2048</span>):
+    <span class="cf">if</span> nframes <span class="op">is</span> <span class="va">None</span>:
+        nframes <span class="op">=</span> <span class="op">-</span><span class="dv">1</span>
+
+    w <span class="op">=</span> wave.<span class="bu">open</span>(filename, <span class="st">'w'</span>)
+    w.setparams((nchannels, sampwidth, framerate, nframes, <span class="st">'NONE'</span>, <span class="st">'not compressed'</span>))
+
+    max_amplitude <span class="op">=</span> <span class="bu">float</span>(<span class="bu">int</span>((<span class="dv">2</span> <span class="op">**</span> (sampwidth <span class="op">*</span> <span class="dv">8</span>)) <span class="op">/</span> <span class="dv">2</span>) <span class="op">-</span> <span class="dv">1</span>)
+
+    <span class="co"># split the samples into chunks (to reduce memory consumption and improve performance)</span>
+    <span class="cf">for</span> chunk <span class="op">in</span> grouper(bufsize, samples):
+        frames <span class="op">=</span> <span class="st">''</span>.join(<span class="st">''</span>.join(struct.pack(<span class="st">'h'</span>, <span class="bu">int</span>(max_amplitude <span class="op">*</span> sample)) <span class="cf">for</span> sample <span class="op">in</span> channels) <span class="cf">for</span> channels <span class="op">in</span> chunk <span class="cf">if</span> channels <span class="op">is</span> <span class="op">not</span> <span class="va">None</span>)
+        w.writeframesraw(frames)
+
+    w.close()
+
+    <span class="cf">return</span> filename</code></pre></div>
+<h2 id="wavebender"><code>wavebender</code></h2>
+<p>I have compiled these techniques and a few others into a module called <code>wavebender</code>. Here’s the current source code (at the time of writing), but you can always find the latest at <a href="https://github.com/zacharydenton/wavebender" class="uri">https://github.com/zacharydenton/wavebender</a>.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co">#!/usr/bin/env python</span>
+<span class="im">import</span> sys
+<span class="im">import</span> wave
+<span class="im">import</span> math
+<span class="im">import</span> struct
+<span class="im">import</span> random
+<span class="im">import</span> argparse
+<span class="im">from</span> itertools <span class="im">import</span> <span class="op">*</span>
+
+<span class="kw">def</span> grouper(n, iterable, fillvalue<span class="op">=</span><span class="va">None</span>):
+    <span class="co">"grouper(3, 'ABCDEFG', 'x') --&gt; ABC DEF Gxx"</span>
+    args <span class="op">=</span> [<span class="bu">iter</span>(iterable)] <span class="op">*</span> n
+    <span class="cf">return</span> izip_longest(fillvalue<span class="op">=</span>fillvalue, <span class="op">*</span>args)
+
+<span class="kw">def</span> sine_wave(frequency<span class="op">=</span><span class="fl">440.0</span>, framerate<span class="op">=</span><span class="dv">44100</span>, amplitude<span class="op">=</span><span class="fl">0.5</span>):
+    <span class="co">'''</span>
+<span class="co">    Generate a sine wave at a given frequency of infinite length.</span>
+<span class="co">    '''</span>
+    period <span class="op">=</span> <span class="bu">int</span>(framerate <span class="op">/</span> frequency)
+    <span class="cf">if</span> amplitude <span class="op">&gt;</span> <span class="fl">1.0</span>: amplitude <span class="op">=</span> <span class="fl">1.0</span>
+    <span class="cf">if</span> amplitude <span class="op">&lt;</span> <span class="fl">0.0</span>: amplitude <span class="op">=</span> <span class="fl">0.0</span>
+    lookup_table <span class="op">=</span> [<span class="bu">float</span>(amplitude) <span class="op">*</span> math.sin(<span class="fl">2.0</span><span class="op">*</span>math.pi<span class="op">*</span><span class="bu">float</span>(frequency)<span class="op">*</span>(<span class="bu">float</span>(i<span class="op">%</span>period)<span class="op">/</span><span class="bu">float</span>(framerate))) <span class="cf">for</span> i <span class="op">in</span> <span class="bu">xrange</span>(period)]
+    <span class="cf">return</span> (lookup_table[i<span class="op">%</span>period] <span class="cf">for</span> i <span class="op">in</span> count(<span class="dv">0</span>))
+
+<span class="kw">def</span> square_wave(frequency<span class="op">=</span><span class="fl">440.0</span>, framerate<span class="op">=</span><span class="dv">44100</span>, amplitude<span class="op">=</span><span class="fl">0.5</span>):
+    <span class="cf">for</span> s <span class="op">in</span> sine_wave(frequency, framerate, amplitude):
+        <span class="cf">if</span> s <span class="op">&gt;</span> <span class="dv">0</span>:
+            <span class="cf">yield</span> amplitude
+        <span class="cf">elif</span> s <span class="op">&lt;</span> <span class="dv">0</span>:
+            <span class="cf">yield</span> <span class="op">-</span>amplitude
+        <span class="cf">else</span>:
+            <span class="cf">yield</span> <span class="fl">0.0</span>
+
+<span class="kw">def</span> damped_wave(frequency<span class="op">=</span><span class="fl">440.0</span>, framerate<span class="op">=</span><span class="dv">44100</span>, amplitude<span class="op">=</span><span class="fl">0.5</span>, length<span class="op">=</span><span class="dv">44100</span>):
+    <span class="cf">if</span> amplitude <span class="op">&gt;</span> <span class="fl">1.0</span>: amplitude <span class="op">=</span> <span class="fl">1.0</span>
+    <span class="cf">if</span> amplitude <span class="op">&lt;</span> <span class="fl">0.0</span>: amplitude <span class="op">=</span> <span class="fl">0.0</span>
+    <span class="cf">return</span> (math.exp(<span class="op">-</span>(<span class="bu">float</span>(i<span class="op">%</span>length)<span class="op">/</span><span class="bu">float</span>(framerate))) <span class="op">*</span> s <span class="cf">for</span> i, s <span class="op">in</span> <span class="bu">enumerate</span>(sine_wave(frequency, framerate, amplitude)))
+
+<span class="kw">def</span> white_noise(amplitude<span class="op">=</span><span class="fl">0.5</span>):
+    <span class="co">'''</span>
+<span class="co">    Generate random samples.</span>
+<span class="co">    '''</span>
+    <span class="cf">return</span> (<span class="bu">float</span>(amplitude) <span class="op">*</span> random.uniform(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="cf">for</span> i <span class="op">in</span> count(<span class="dv">0</span>))
+
+<span class="kw">def</span> compute_samples(channels, nsamples<span class="op">=</span><span class="va">None</span>):
+    <span class="co">'''</span>
+<span class="co">    create a generator which computes the samples.</span>
+
+<span class="co">    essentially it creates a sequence of the sum of each function in the channel</span>
+<span class="co">    at each sample in the file for each channel.</span>
+<span class="co">    '''</span>
+    <span class="cf">return</span> islice(izip(<span class="op">*</span>(imap(<span class="bu">sum</span>, izip(<span class="op">*</span>channel)) <span class="cf">for</span> channel <span class="op">in</span> channels)), nsamples)
+
+<span class="kw">def</span> write_wavefile(filename, samples, nframes<span class="op">=</span><span class="va">None</span>, nchannels<span class="op">=</span><span class="dv">2</span>, sampwidth<span class="op">=</span><span class="dv">2</span>, framerate<span class="op">=</span><span class="dv">44100</span>, bufsize<span class="op">=</span><span class="dv">2048</span>):
+    <span class="co">"Write samples to a wavefile."</span>
+    <span class="cf">if</span> nframes <span class="op">is</span> <span class="va">None</span>:
+        nframes <span class="op">=</span> <span class="op">-</span><span class="dv">1</span>
+
+    w <span class="op">=</span> wave.<span class="bu">open</span>(filename, <span class="st">'w'</span>)
+    w.setparams((nchannels, sampwidth, framerate, nframes, <span class="st">'NONE'</span>, <span class="st">'not compressed'</span>))
+
+    max_amplitude <span class="op">=</span> <span class="bu">float</span>(<span class="bu">int</span>((<span class="dv">2</span> <span class="op">**</span> (sampwidth <span class="op">*</span> <span class="dv">8</span>)) <span class="op">/</span> <span class="dv">2</span>) <span class="op">-</span> <span class="dv">1</span>)
+
+    <span class="co"># split the samples into chunks (to reduce memory consumption and improve performance)</span>
+    <span class="cf">for</span> chunk <span class="op">in</span> grouper(bufsize, samples):
+        frames <span class="op">=</span> <span class="st">''</span>.join(<span class="st">''</span>.join(struct.pack(<span class="st">'h'</span>, <span class="bu">int</span>(max_amplitude <span class="op">*</span> sample)) <span class="cf">for</span> sample <span class="op">in</span> channels) <span class="cf">for</span> channels <span class="op">in</span> chunk <span class="cf">if</span> channels <span class="op">is</span> <span class="op">not</span> <span class="va">None</span>)
+        w.writeframesraw(frames)
+
+    w.close()
+
+    <span class="cf">return</span> filename
+
+<span class="kw">def</span> write_pcm(f, samples, sampwidth<span class="op">=</span><span class="dv">2</span>, framerate<span class="op">=</span><span class="dv">44100</span>, bufsize<span class="op">=</span><span class="dv">2048</span>):
+    <span class="co">"Write samples as raw PCM data."</span>
+    max_amplitude <span class="op">=</span> <span class="bu">float</span>(<span class="bu">int</span>((<span class="dv">2</span> <span class="op">**</span> (sampwidth <span class="op">*</span> <span class="dv">8</span>)) <span class="op">/</span> <span class="dv">2</span>) <span class="op">-</span> <span class="dv">1</span>)
+
+    <span class="co"># split the samples into chunks (to reduce memory consumption and improve performance)</span>
+    <span class="cf">for</span> chunk <span class="op">in</span> grouper(bufsize, samples):
+        frames <span class="op">=</span> <span class="st">''</span>.join(<span class="st">''</span>.join(struct.pack(<span class="st">'h'</span>, <span class="bu">int</span>(max_amplitude <span class="op">*</span> sample)) <span class="cf">for</span> sample <span class="op">in</span> channels) <span class="cf">for</span> channels <span class="op">in</span> chunk <span class="cf">if</span> channels <span class="op">is</span> <span class="op">not</span> <span class="va">None</span>)
+        f.write(frames)
+
+    f.close()
+
+    <span class="cf">return</span> filename
+
+<span class="kw">def</span> main():
+    parser <span class="op">=</span> argparse.ArgumentParser()
+    parser.add_argument(<span class="st">'-c'</span>, <span class="st">'--channels'</span>, <span class="bu">help</span><span class="op">=</span><span class="st">"Number of channels to produce"</span>, default<span class="op">=</span><span class="dv">2</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>)
+    parser.add_argument(<span class="st">'-b'</span>, <span class="st">'--bits'</span>, <span class="bu">help</span><span class="op">=</span><span class="st">"Number of bits in each sample"</span>, choices<span class="op">=</span>(<span class="dv">16</span>,), default<span class="op">=</span><span class="dv">16</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>)
+    parser.add_argument(<span class="st">'-r'</span>, <span class="st">'--rate'</span>, <span class="bu">help</span><span class="op">=</span><span class="st">"Sample rate in Hz"</span>, default<span class="op">=</span><span class="dv">44100</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>)
+    parser.add_argument(<span class="st">'-t'</span>, <span class="st">'--time'</span>, <span class="bu">help</span><span class="op">=</span><span class="st">"Duration of the wave in seconds."</span>, default<span class="op">=</span><span class="dv">60</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>)
+    parser.add_argument(<span class="st">'-a'</span>, <span class="st">'--amplitude'</span>, <span class="bu">help</span><span class="op">=</span><span class="st">"Amplitude of the wave on a scale of 0.0-1.0."</span>, default<span class="op">=</span><span class="fl">0.5</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">float</span>)
+    parser.add_argument(<span class="st">'-f'</span>, <span class="st">'--frequency'</span>, <span class="bu">help</span><span class="op">=</span><span class="st">"Frequency of the wave in Hz"</span>, default<span class="op">=</span><span class="fl">440.0</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">float</span>)
+    parser.add_argument(<span class="st">'filename'</span>, <span class="bu">help</span><span class="op">=</span><span class="st">"The file to generate."</span>)
+    args <span class="op">=</span> parser.parse_args()
+
+    <span class="co"># each channel is defined by infinite functions which are added to produce a sample.</span>
+    channels <span class="op">=</span> ((sine_wave(args.frequency, args.rate, args.amplitude),) <span class="cf">for</span> i <span class="op">in</span> <span class="bu">range</span>(args.channels))
+
+    <span class="co"># convert the channel functions into waveforms</span>
+    samples <span class="op">=</span> compute_samples(channels, args.rate <span class="op">*</span> args.time)
+
+    <span class="co"># write the samples to a file</span>
+    <span class="cf">if</span> args.filename <span class="op">==</span> <span class="st">'-'</span>:
+        filename <span class="op">=</span> sys.stdout
+    <span class="cf">else</span>:
+        filename <span class="op">=</span> args.filename
+    write_wavefile(filename, samples, args.rate <span class="op">*</span> args.time, args.channels, args.bits <span class="op">/</span> <span class="dv">8</span>, args.rate)
+
+<span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">"__main__"</span>:
+    main()</code></pre></div>
+<p>You can execute the file directly and it will generate a pure sine tone.</p>
+<h2 id="examples">Examples</h2>
+<h3 id="sbagen">SBaGen</h3>
+<p><a href="http://uazu.net/sbagen/">SBaGen</a> is a program which generates binaural beats. It’s reasonably complex, consisting of around 3000 lines of C. You can instruct SBaGen to generate a 200Hz pure sine tone in one channel and a 204Hz pure sine tone in the other channel by doing this:</p>
+<pre class="console"><code>$ sbagen -i 202+2/10</code></pre>
+<p>You can also generate multiple binaural beats simultaneously:</p>
+<pre class="console"><code>$ sbagen -i 202+2/10 400+20/10</code></pre>
+<p>The following emulates <code>sbagen -i</code>, but it’s about 100x slower. No problem for real-time use on a modern computer, but you’re better off using the real deal for serious use.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co">#!/usr/bin/env python</span>
+<span class="im">import</span> re
+<span class="im">import</span> sys
+<span class="im">from</span> wavebender <span class="im">import</span> <span class="op">*</span>
+<span class="im">from</span> itertools <span class="im">import</span> <span class="op">*</span>
+
+<span class="kw">def</span> sbagen_phrase(phrase):
+    <span class="co">'''</span>
+<span class="co">    147.0+4.0/1.27 -&gt; two sine_waves. one 145.0 hz; one 149.0 hz. each at amplitude of 0.0127.</span>
+<span class="co">    '''</span>
+    <span class="cf">if</span> <span class="st">'pink'</span> <span class="op">in</span> phrase:
+        <span class="co"># pink/40 -&gt; white_noise(amplitude=0.4)</span>
+        amplitude <span class="op">=</span> <span class="bu">float</span>(phrase.split(<span class="st">'/'</span>)[<span class="op">-</span><span class="dv">1</span>]) <span class="op">/</span> <span class="fl">100.0</span>
+        <span class="cf">return</span> (white_noise(amplitude),
+                white_noise(amplitude))
+
+    carrier, remainder <span class="op">=</span> re.split(<span class="st">'[+-]'</span>, phrase, <span class="dv">1</span>)
+    beatfreq, amplitude <span class="op">=</span> remainder.split(<span class="st">'/'</span>)
+
+    carrier <span class="op">=</span> <span class="bu">float</span>(carrier)
+    beatfreq <span class="op">=</span> <span class="bu">float</span>(beatfreq)
+    amplitude <span class="op">=</span> <span class="bu">float</span>(amplitude) <span class="op">/</span> <span class="fl">100.0</span>
+
+    <span class="cf">return</span> (sine_wave((carrier <span class="op">-</span> beatfreq<span class="op">/</span><span class="dv">2</span>), amplitude<span class="op">=</span>amplitude),
+            sine_wave((carrier <span class="op">+</span> beatfreq<span class="op">/</span><span class="dv">2</span>), amplitude<span class="op">=</span>amplitude))
+
+<span class="kw">def</span> sbagen_line(line, length<span class="op">=</span><span class="va">None</span>):
+    <span class="co">'''</span>
+<span class="co">    Given a sequence of (l, r), (l, r), return a sequence of (l, l), (r, r).</span>
+<span class="co">    '''</span>
+    <span class="cf">return</span> izip(<span class="op">*</span>(imap(<span class="kw">lambda</span> s: islice(s, length), sbagen_phrase(phrase)) <span class="cf">for</span> phrase <span class="op">in</span> line.split()))
+
+<span class="cf">if</span> sys.argv[<span class="dv">1</span>:]:
+    channels <span class="op">=</span> sbagen_line(<span class="st">' '</span>.join(sys.argv[<span class="dv">1</span>:]))
+<span class="cf">else</span>:
+    sys.exit(<span class="dv">1</span>)
+
+samples <span class="op">=</span> compute_samples(channels)
+write_wavefile(sys.stdout, samples)</code></pre></div>
+<p>You can use it like this:</p>
+<pre class="console"><code>$ ./sbagen.py 272.2+7.83/10 332+7.83/10 421.3+7.83/10 289.4+7.83/10 367.5+7.83/10 442+7.83/10 295.7+7.83/10 414.7+7.83/10 422+7.83/10 | aplay</code></pre>
+<p>That generates a bunch of simultaneous binaural tones and uses <code>aplay</code> to play them in realtime.</p>
+<h3 id="melody">Melody</h3>
+<p>Here’s an example of a melody, using <code>itertools</code> and <code>wavebender</code>.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co">#!/usr/bin/env python</span>
+<span class="im">from</span> wavebender <span class="im">import</span> <span class="op">*</span>
+<span class="im">from</span> itertools <span class="im">import</span> <span class="op">*</span>
+<span class="im">import</span> sys
+
+<span class="kw">def</span> ncycles(iterable, n):
+    <span class="co">"Returns the sequence elements n times"</span>
+    <span class="cf">return</span> chain.from_iterable(repeat(<span class="bu">tuple</span>(iterable), n))
+
+<span class="kw">def</span> waves():
+    l <span class="op">=</span> <span class="bu">int</span>(<span class="dv">44100</span><span class="op">*</span><span class="fl">0.4</span>) <span class="co"># each note lasts 0.4 seconds</span>
+
+    <span class="cf">return</span> cycle(chain(ncycles(chain(islice(damped_wave(frequency<span class="op">=</span><span class="fl">440.0</span>, amplitude<span class="op">=</span><span class="fl">0.1</span>, length<span class="op">=</span><span class="bu">int</span>(l<span class="op">/</span><span class="dv">4</span>)), l),
+                                     islice(damped_wave(frequency<span class="op">=</span><span class="fl">261.63</span>, amplitude<span class="op">=</span><span class="fl">0.1</span>, length<span class="op">=</span><span class="bu">int</span>(l<span class="op">/</span><span class="dv">4</span>)), l),
+                                     islice(damped_wave(frequency<span class="op">=</span><span class="fl">329.63</span>, amplitude<span class="op">=</span><span class="fl">0.1</span>, length<span class="op">=</span><span class="bu">int</span>(l<span class="op">/</span><span class="dv">4</span>)), l)), <span class="dv">3</span>),
+                       islice(damped_wave(frequency<span class="op">=</span><span class="fl">440.0</span>, amplitude<span class="op">=</span><span class="fl">0.1</span>, length<span class="op">=</span><span class="dv">3</span><span class="op">*</span>l), <span class="dv">3</span><span class="op">*</span>l),
+
+                       ncycles(chain(islice(damped_wave(frequency<span class="op">=</span><span class="fl">293.66</span>, amplitude<span class="op">=</span><span class="fl">0.1</span>, length<span class="op">=</span><span class="bu">int</span>(l<span class="op">/</span><span class="dv">4</span>)), l),
+                                     islice(damped_wave(frequency<span class="op">=</span><span class="fl">261.63</span>, amplitude<span class="op">=</span><span class="fl">0.1</span>, length<span class="op">=</span><span class="bu">int</span>(l<span class="op">/</span><span class="dv">4</span>)), l),
+                                     islice(damped_wave(frequency<span class="op">=</span><span class="fl">293.66</span>, amplitude<span class="op">=</span><span class="fl">0.1</span>, length<span class="op">=</span><span class="bu">int</span>(l<span class="op">/</span><span class="dv">4</span>)), l)), <span class="dv">2</span>),
+                       chain(islice(damped_wave(frequency<span class="op">=</span><span class="fl">293.66</span>, amplitude<span class="op">=</span><span class="fl">0.1</span>, length<span class="op">=</span><span class="bu">int</span>(l<span class="op">/</span><span class="dv">4</span>)), l),
+                             islice(damped_wave(frequency<span class="op">=</span><span class="fl">329.63</span>, amplitude<span class="op">=</span><span class="fl">0.1</span>, length<span class="op">=</span><span class="bu">int</span>(l<span class="op">/</span><span class="dv">4</span>)), l),
+                             islice(damped_wave(frequency<span class="op">=</span><span class="fl">293.66</span>, amplitude<span class="op">=</span><span class="fl">0.1</span>, length<span class="op">=</span><span class="bu">int</span>(l<span class="op">/</span><span class="dv">4</span>)), l)),
+                       islice(damped_wave(frequency<span class="op">=</span><span class="fl">261.63</span>, amplitude<span class="op">=</span><span class="fl">0.1</span>, length<span class="op">=</span><span class="dv">3</span><span class="op">*</span>l), <span class="dv">3</span><span class="op">*</span>l)))
+
+channels <span class="op">=</span> ((waves(),), (waves(), white_noise(amplitude<span class="op">=</span><span class="fl">0.001</span>),))
+
+samples <span class="op">=</span> compute_samples(channels, <span class="va">None</span>)
+write_wavefile(sys.stdout, samples, <span class="va">None</span>)</code></pre></div>
+<h2 id="conclusion">Conclusion</h2>
+<p>Well, there’s your daily abuse of <code>itertools</code>. For more <code>itertools</code> madness, check out my <a href="https://zach.se/project-euler-solutions/">Project Euler Solutions</a>.</p>
+
+  
+<hr>
+<p>Questions? Comments? Send me an email: <a href="mailto:z@chdenton.com">z@chdenton.com</a></p>
+
+
+</article>
+
+        <script src="./Generate Audio with Python - Zach Denton_files/main.js"></script>
+    <script type="text/javascript">/* <![CDATA[ */(function(d,s,a,i,j,r,l,m,t){try{l=d.getElementsByTagName('a');t=d.createElement('textarea');for(i=0;l.length-i;i++){try{a=l[i].href;s=a.indexOf('/cdn-cgi/l/email-protection');m=a.length;if(a&&s>-1&&m>28){j=28+s;s='';if(j<m){r='0x'+a.substr(j,2)|0;for(j+=2;j<m&&a.charAt(j)!='X';j+=2)s+='%'+('0'+('0x'+a.substr(j,2)^r).toString(16)).slice(-2);j++;s=decodeURIComponent(s)+a.substr(j,m-j)}t.innerHTML=s.replace(/</g,'&lt;').replace(/>/g,'&gt;');l[i].href='mailto:'+t.value}}catch(e){}}}catch(e){}})(document);/* ]]> */</script>
+
+</body></html>
